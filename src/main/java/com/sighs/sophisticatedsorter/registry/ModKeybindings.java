@@ -13,16 +13,24 @@ import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT, modid = SophisticatedSorter.MODID)
 public class ModKeybindings {
-    public static final KeyMapping CONTROL_KEY = new KeyMapping("key.sophisticatedsorter.sort",
+    public static final KeyMapping SORT_KEY = new KeyMapping("key.sophisticatedsorter.sort",
             KeyConflictContext.GUI,
             KeyModifier.NONE,
             InputConstants.Type.SCANCODE,
             GLFW.GLFW_KEY_R,
             "key.categories.sophisticatedsorter"
     );
+    public static final KeyMapping DISABLE_KEY = new KeyMapping("key.sophisticatedsorter.disable",
+            KeyConflictContext.GUI,
+            KeyModifier.NONE,
+            InputConstants.Type.SCANCODE,
+            GLFW.GLFW_KEY_U,
+            "key.categories.sophisticatedsorter"
+    );
 
     @SubscribeEvent
     public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
-        event.register(CONTROL_KEY);
+        event.register(SORT_KEY);
+        event.register(DISABLE_KEY);
     }
 }

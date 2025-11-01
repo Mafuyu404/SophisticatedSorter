@@ -1,7 +1,12 @@
 package com.sighs.sophisticatedsorter.utils;
 
+import com.sighs.sophisticatedsorter.Config;
 import com.sighs.sophisticatedsorter.api.IStorageScreenBase;
 import com.sighs.sophisticatedsorter.visual.VisualStorageScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.StorageScreenBase;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.controls.Button;
@@ -60,5 +65,19 @@ public class ClientUtils {
     public static Predicate<ItemStack> getStackFilter(String string) {
         var faker = new VisualStorageScreen();
         return ((IStorageScreenBase) faker).getVisualStackFilter(string);
+    }
+
+    public static boolean isDisabledScreen(Screen screen) {
+        return Config.BLACKLIST.get().contains(getScreenId(screen));
+    }
+    public static String getScreenId(Screen screen) {
+        return getTranslationKey(screen.getTitle());
+    }
+    private static String getTranslationKey(Component component) {
+        ComponentContents contents = component.getContents();
+        if (contents instanceof TranslatableContents translatable) {
+            return translatable.getKey();
+        }
+        return null;
     }
 }

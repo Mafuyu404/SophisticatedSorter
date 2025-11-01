@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(targets = "net.p3pp3rf1y.sophisticatedcore.client.gui.SearchBox", remap = false)
 public class SearchBoxMixin {
-    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/p3pp3rf1y/sophisticatedcore/client/gui/StorageScreenBase;setFocused(Lnet/minecraft/client/gui/components/events/GuiEventListener;)V"))
+    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/p3pp3rf1y/sophisticatedcore/client/gui/StorageScreenBase;setFocused(Lnet/minecraft/client/gui/components/events/GuiEventListener;)V"), remap = true)
     private void redirect(StorageScreenBase<?> instance, GuiEventListener guiEventListener) {
         if (instance == null) {
             Minecraft.getInstance().screen.setFocused(guiEventListener);

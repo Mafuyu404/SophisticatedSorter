@@ -53,14 +53,15 @@ public class CoreUtils {
 
     public static void sortContainer(ServerPlayer player, SortBy sortBy) {
         var menu = player.containerMenu;
-        var items = menu.getItems();
         List<Integer> needSort = new ArrayList<>();
 
-        for (int i = 0; i < items.size() - 36; i++) needSort.add(i);
+        for (int i = 0; i < menu.slots.size(); i++) {
+            if (!(menu.getSlot(i).container instanceof Inventory)) needSort.add(i);
+        }
 
         var handler = new ItemStackHandler(needSort.size());
         for (int i = 0; i < needSort.size(); i++) {
-            handler.setStackInSlot(i, items.get(needSort.get(i)));
+            handler.setStackInSlot(i, menu.getSlot(needSort.get(i)).getItem());
         }
 
         InventorySorter.sortHandler(handler, CoreUtils.getComparator(sortBy), new HashSet<>());

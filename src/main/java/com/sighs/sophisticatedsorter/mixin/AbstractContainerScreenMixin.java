@@ -1,8 +1,6 @@
 package com.sighs.sophisticatedsorter.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.sighs.sophisticatedsorter.SophisticatedSorter;
-import com.sighs.sophisticatedsorter.client.SearchBox;
 import com.sighs.sophisticatedsorter.utils.ClientUtils;
 import com.sighs.sophisticatedsorter.utils.CoreUtils;
 import com.sighs.sophisticatedsorter.visual.VisualStorageScreen;
@@ -14,7 +12,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.p3pp3rf1y.sophisticatedcore.Config;
@@ -49,18 +46,23 @@ public abstract class AbstractContainerScreenMixin extends Screen {
 
     @Shadow protected int inventoryLabelY;
 
+    @Shadow protected abstract void init();
+
     protected AbstractContainerScreenMixin(Component p_96550_) {
         super(p_96550_);
     }
 
+    @Unique private boolean isScreenDisabled = false;
     @Unique private boolean isInventoryScreen = false;
     @Unique private boolean canContainerSort = false;
     @Unique private TextBox searchBox;
 
     @Inject(method = "init", at = @At("RETURN"))
     private void q(CallbackInfo ci) {
+        isScreenDisabled = ClientUtils.isDisabledScreen(this);
         if ((Object) this instanceof CreativeModeInventoryScreen) return;
         if ((Object) this instanceof StorageScreenBase) return;
+        if (isScreenDisabled) return;
 
         var menu = Minecraft.getInstance().player.containerMenu;
         isInventoryScreen = Minecraft.getInstance().screen instanceof InventoryScreen;
@@ -142,6 +144,11 @@ public abstract class AbstractContainerScreenMixin extends Screen {
         if (searchBox != null) {
             if (searchBox.getValue().isEmpty()) stackPredicate = null;
             else stackPredicate = ClientUtils.getStackFilter(searchBox.getValue());
+        }
+        if (isScreenDisabled != ClientUtils.isDisabledScreen(this)) {
+            isScreenDisabled = ClientUtils.isDisabledScreen(this);
+            this.renderables.clear();
+            init();
         }
     }
 
