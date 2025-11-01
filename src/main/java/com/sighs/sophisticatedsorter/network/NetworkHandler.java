@@ -20,6 +20,7 @@ public class NetworkHandler {
     public static void register() {
         int packetId = 0;
         CHANNEL.registerMessage(packetId++, ServerSortPacket.class, ServerSortPacket::encode, ServerSortPacket::decode, ServerSortPacket::handle);
+        CHANNEL.registerMessage(packetId++, ServerTransferPacket.class, ServerTransferPacket::encode, ServerTransferPacket::decode, ServerTransferPacket::handle);
 
     }
 

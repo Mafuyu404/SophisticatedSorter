@@ -3,13 +3,14 @@ package com.sighs.sophisticatedsorter.utils;
 import com.sighs.sophisticatedsorter.Config;
 import com.sighs.sophisticatedsorter.network.NetworkHandler;
 import com.sighs.sophisticatedsorter.network.ServerSortPacket;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import com.sighs.sophisticatedsorter.network.ServerTransferPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.items.ItemStackHandler;
 import net.p3pp3rf1y.sophisticatedcore.common.gui.SortBy;
 import net.p3pp3rf1y.sophisticatedcore.inventory.ItemStackKey;
@@ -45,6 +46,9 @@ public class CoreUtils {
         String target = "container";
         if (!canContainerSort(menu)) target = "inventory";
         NetworkHandler.CHANNEL.sendToServer(new ServerSortPacket(getSortBy().getSerializedName(), target));
+    }
+    public static void serverTransfer(boolean transferToContainer, boolean filter) {
+        NetworkHandler.CHANNEL.sendToServer(new ServerTransferPacket(transferToContainer, filter));
     }
 
     public static void sortContainer(ServerPlayer player, SortBy sortBy) {
@@ -82,6 +86,28 @@ public class CoreUtils {
 
         for (int i = 0; i < needSort.size(); i++) {
             inventory.setItem(needSort.get(i), handler.getStackInSlot(i));
+        }
+    }
+
+    public static void transfer(Player player, boolean transferToContainer, boolean filter) {
+        AbstractContainerMenu menu = player.containerMenu;
+        List<Slot> needTransferSlots = new ArrayList<>();
+        List<Item> targetSlotItems = new ArrayList<>();
+        for (Slot slot : menu.slots) {
+            // 要转移到容器且为物品栏槽位时，或，并非转移到容器且不为物品栏槽位时。
+            if (transferToContainer == slot.container instanceof Inventory) {
+                needTransferSlots.add(slot);
+            } else targetSlotItems.add(slot.getItem().getItem());
+        }
+        if (transferToContainer) {
+            // 去掉玩家快捷栏。
+            needTransferSlots.subList(needTransferSlots.size() - 9, needTransferSlots.size()).clear();
+        }
+        for (Slot slot : needTransferSlots) {
+            // 不筛选就转移，筛选了就看一下有没有在目标容器里再转移。
+            if (!filter || targetSlotItems.contains(slot.getItem().getItem())) {
+                menu.quickMoveStack(player, slot.index);
+            }
         }
     }
 }
