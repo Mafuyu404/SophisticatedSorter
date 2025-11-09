@@ -28,7 +28,9 @@
   "depends": {
     "fabricloader": "*",
     "fabric": "*",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "1.21.1",
+    "cloth-config2": "*",
+    "sophisticatedcore": "*"
   },
   "accessWidener" : "sophisticatedsorter.accesswidener"
 }
